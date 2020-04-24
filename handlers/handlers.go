@@ -497,10 +497,18 @@ func CallbackHandler(w http.ResponseWriter, r *http.Request) {
 	//getProviderJWT(r, &user)
 	log.Debug("/auth CallbackHandler")
 	log.Debugf("/auth %+v", user)
+	log.Debugf("requestedURL %v", session.Values["requestedURL"].(string))
 
 	if ok, err := VerifyUser(user); !ok {
 		log.Error(err)
-		renderIndex(w, fmt.Sprintf("/auth User is not authorized. %s Please try again.", err))
+//		renderIndex(w, fmt.Sprintf("/auth User is not authorized. %s Please try again.", err))
+                requestedURL := session.Values["requestedURL"].(string)
+                if requestedURL != "" {
+	                log.Debugf("requestedURL = $v", requestedURL)
+                        renderIndex(w, fmt.Sprintf("/auth User is not authorized. %s <a href=\"%s\">Please try again</a>.", err, requestedURL))
+                } else {
+                        renderIndex(w, fmt.Sprintf("/auth User is not authorized. %s Please try again.", err))
+                }
 		return
 	}
 
